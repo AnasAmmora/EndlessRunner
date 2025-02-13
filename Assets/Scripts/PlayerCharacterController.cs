@@ -7,9 +7,9 @@ public class PlayerCharacterController : MonoBehaviour
     [SerializeField] private LayerMask groundLayers;
     [SerializeField] private float runSpeed = 8f;
     [SerializeField] private float jumpHeight = 10f;
-    [SerializeField] private Transform Foots;
+    
 
-    private float gravity = -50f;
+    private float gravity = -55;
     private CharacterController characterController;
     private Vector3 velocity;
     [SerializeField] private bool isGrounded;
@@ -26,20 +26,20 @@ public class PlayerCharacterController : MonoBehaviour
     void Update()
     {
 
-        
-        isGrounded = Physics.CheckSphere(Foots.position, 0.1f, groundLayers, QueryTriggerInteraction.Ignore);
+
+        isGrounded = Physics.CheckSphere(transform.position, 0.4f, groundLayers, QueryTriggerInteraction.Ignore);
 
 
         if (isGrounded && velocity.y < 0)
         {
-            velocity.y = 0; 
+            velocity.y = 0;
         }
         else
         {
             velocity.y += gravity * Time.deltaTime;
         }
 
-        if (isGrounded && Input.GetButtonDown("Jump")) 
+        if (isGrounded && Input.GetButtonDown("Jump"))
         {
             velocity.y += Mathf.Sqrt(jumpHeight * -2 * gravity);
         }
@@ -50,5 +50,5 @@ public class PlayerCharacterController : MonoBehaviour
         characterController.Move(velocity * Time.deltaTime);
     }
 
-    
+
 }
