@@ -17,6 +17,7 @@ public class PlayerCharacterController : MonoBehaviour
     private Animator animator;
     private Vector3 velocity;
     private bool isGrounded;
+    private bool isAttacking = false;
 
 
     void Start()
@@ -35,7 +36,7 @@ public class PlayerCharacterController : MonoBehaviour
 
         HandleGravity();
         HandleMovement();
-         
+        HandleAttack();
     }
 
     private void HandleGravity()
@@ -63,6 +64,19 @@ public class PlayerCharacterController : MonoBehaviour
     {
         characterController.Move(new Vector3(0, 0, runSpeed) * Time.deltaTime);
     }
+    private void HandleAttack()
+    {
+        if (Input.GetKeyDown(KeyCode.A) && !isAttacking) 
+        {
+            isAttacking = true; 
+            HandleAttackAnimation();
+
+
+            Invoke(nameof(EndAttackAnimation), 1f);
+        }
+
+
+    }
     private void HandleIdleAnimation()
     {
         animator.SetBool("Started", GameManager.Instance.isStarted);
@@ -71,5 +85,15 @@ public class PlayerCharacterController : MonoBehaviour
     private void HandleJumpAnimation()
     {
         animator.SetTrigger("Jump");
+    }
+    private void HandleAttackAnimation()
+    {
+        animator.SetLayerWeight(1, 1f);
+        animator.SetTrigger("Attack");
+    }
+    private void EndAttackAnimation()
+    {
+        animator.SetLayerWeight(1, 0f);
+        isAttacking = false;
     }
 }
