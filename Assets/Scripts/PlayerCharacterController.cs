@@ -32,7 +32,6 @@ public class PlayerCharacterController : MonoBehaviour
 
         if (!GameManager.Instance.isStarted || GameManager.Instance.isPaused)
             return;
-        Debug.Log(GameManager.Instance.isStarted);
 
         HandleGravity();
         HandleMovement();
@@ -86,14 +85,32 @@ public class PlayerCharacterController : MonoBehaviour
     {
         animator.SetTrigger("Jump");
     }
+
     private void HandleAttackAnimation()
     {
-        animator.SetLayerWeight(1, 1f);
+        StartCoroutine(SmoothLayerWeightChange(1f, 0.2f));
         animator.SetTrigger("Attack");
     }
+
     private void EndAttackAnimation()
     {
-        animator.SetLayerWeight(1, 0f);
+        StartCoroutine(SmoothLayerWeightChange(0f, 0.2f));
         isAttacking = false;
+    }
+
+    private IEnumerator SmoothLayerWeightChange(float targetWeight, float duration)
+    {
+        float startWeight = animator.GetLayerWeight(1);
+        float elapsedTime = 0f;
+
+        while (elapsedTime < duration)
+        {
+            elapsedTime += Time.deltaTime;
+            float newWeight = Mathf.Lerp(startWeight, targetWeight, elapsedTime / duration);
+            animator.SetLayerWeight(1, newWeight);
+            yield return null;
+        }
+
+        animator.SetLayerWeight(1, targetWeight);
     }
 }
