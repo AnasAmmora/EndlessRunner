@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEditor.Animations;
 using UnityEditorInternal;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerCharacterController : MonoBehaviour
 {
@@ -18,6 +19,7 @@ public class PlayerCharacterController : MonoBehaviour
     [SerializeField] private Transform attackPoint;
     [SerializeField] private float shootForce;
     [SerializeField] private float timeBetweenShots = 1f;
+    [SerializeField] private Slider reloadingProgresSlider;
     //bools
     bool isAttacking = false;
     bool readyToAttack = true;
@@ -34,6 +36,7 @@ public class PlayerCharacterController : MonoBehaviour
     {
         characterController = GetComponent<CharacterController>();
         animator = GetComponentInChildren<Animator>();
+        reloadingProgresSlider.value = 1;
     }
 
     void Update()
@@ -78,27 +81,22 @@ public class PlayerCharacterController : MonoBehaviour
         //Attack Input
         isAttacking = Input.GetKey(KeyCode.A);
 
-        if (Input.GetKeyDown(KeyCode.A) && !isAttacking) 
+        if (readyToAttack && isAttacking)
         {
-
-        }
-        if (readyToAttack && isAttacking) 
-        {
+            reloadingProgresSlider.value = 0;
             readyToAttack = false;
 
-            HandleAttackAnimation();
-            
-            Invoke("Attack", timeBetweenShots/2);
-            Invoke("EndAttackAnimation", timeBetweenShots);
+            HandleAttackAnimation();  
+            StartCoroutine(ReloadingProgress());
+            Invoke("Attack", timeBetweenShots / 2);
+            Invoke("EndAttack", timeBetweenShots);
         }
-
-
     }
     private void Attack()
     {
         Vector3 bulletDirection = attackPoint.forward;
 
-        GameObject currentBullet = Instantiate(bullet, attackPoint.position, Quaternion.identity); //
+        GameObject currentBullet = Instantiate(bullet, attackPoint.position, attackPoint.rotation); //
 
 
         currentBullet.GetComponent<Rigidbody>().AddForce(bulletDirection.normalized * shootForce, ForceMode.Impulse);
@@ -118,9 +116,10 @@ public class PlayerCharacterController : MonoBehaviour
     {
         StartCoroutine(SmoothLayerWeightChange(1f, 0.2f));
         animator.SetTrigger("Attack");
+
     }
 
-    private void EndAttackAnimation()
+    private void EndAttack()
     {
         StartCoroutine(SmoothLayerWeightChange(0f, 0.2f));
         readyToAttack = true;
@@ -142,4 +141,22 @@ public class PlayerCharacterController : MonoBehaviour
 
         animator.SetLayerWeight(1, targetWeight);
     }
+    private IEnumerator ReloadingProgress()
+    {
+        float elapsedTime = 0f;
+
+        while (elapsedTime < timeBetweenShots)
+        {
+            elapsedTime += Time.deltaTime;
+
+
+            reloadingProgresSlider.value = Mathf.Clamp01(elapsedTime / timeBetweenShots);
+
+            yield return null; 
+        }
+        reloadingProgresSlider.value = 1f;
+    }
 }
+
+
+
