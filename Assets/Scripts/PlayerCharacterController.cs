@@ -6,18 +6,28 @@ using UnityEngine;
 
 public class PlayerCharacterController : MonoBehaviour
 {
+    [Header("Movement Setting")]
     [SerializeField] private LayerMask groundLayers;
     [SerializeField] private float runSpeed = 8f;
     [SerializeField] private float jumpHeight = 10f;
     [SerializeField] private float gravity = -55;
 
+    [Header("Attack Setting")]
+    [SerializeField] private GameObject bullet;
+    [SerializeField] private GameObject bulletInHand;
+    [SerializeField] private Transform attackPoint;
+    [SerializeField] private float shootForce;
+    [SerializeField] private float timeBetweenShots = 1f;
+    //bools
+    bool isAttacking = false;
+    bool readyToAttack = true;
 
 
     private CharacterController characterController;
     private Animator animator;
     private Vector3 velocity;
     private bool isGrounded;
-    private bool isAttacking = false;
+    
 
 
     void Start()
@@ -65,16 +75,34 @@ public class PlayerCharacterController : MonoBehaviour
     }
     private void HandleAttack()
     {
+        //Attack Input
+        isAttacking = Input.GetKey(KeyCode.A);
+
         if (Input.GetKeyDown(KeyCode.A) && !isAttacking) 
         {
-            isAttacking = true; 
+
+        }
+        if (readyToAttack && isAttacking) 
+        {
+            readyToAttack = false;
+
             HandleAttackAnimation();
-
-
-            Invoke(nameof(EndAttackAnimation), 1f);
+            
+            Invoke("Attack", timeBetweenShots/2);
+            Invoke("EndAttackAnimation", timeBetweenShots);
         }
 
 
+    }
+    private void Attack()
+    {
+        Vector3 bulletDirection = attackPoint.forward;
+
+        GameObject currentBullet = Instantiate(bullet, attackPoint.position, Quaternion.identity); //
+
+
+        currentBullet.GetComponent<Rigidbody>().AddForce(bulletDirection.normalized * shootForce, ForceMode.Impulse);
+        bulletInHand.SetActive(false);
     }
     private void HandleIdleAnimation()
     {
@@ -95,7 +123,8 @@ public class PlayerCharacterController : MonoBehaviour
     private void EndAttackAnimation()
     {
         StartCoroutine(SmoothLayerWeightChange(0f, 0.2f));
-        isAttacking = false;
+        readyToAttack = true;
+        bulletInHand.SetActive(true);
     }
 
     private IEnumerator SmoothLayerWeightChange(float targetWeight, float duration)
