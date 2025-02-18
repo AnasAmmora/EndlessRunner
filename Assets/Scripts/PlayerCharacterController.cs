@@ -20,16 +20,18 @@ public class PlayerCharacterController : MonoBehaviour
     [SerializeField] private float shootForce;
     [SerializeField] private float timeBetweenShots = 1f;
     [SerializeField] private Slider reloadingProgresSlider;
-    //bools
-    bool isAttacking = false;
-    bool readyToAttack = true;
+    [Header("Health Setting")]
+    [SerializeField] private float health = 1f;
+
+
 
 
     private CharacterController characterController;
     private Animator animator;
     private Vector3 velocity;
     private bool isGrounded;
-    
+    bool isAttacking = false;
+    bool readyToAttack = true;
 
 
     void Start()
@@ -155,6 +157,24 @@ public class PlayerCharacterController : MonoBehaviour
             yield return null; 
         }
         reloadingProgresSlider.value = 1f;
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        Enemy enemy = other.GetComponent<Enemy>();
+        if (enemy != null)
+        {
+            enemy.DestroyEnemy(true);
+            DamagePlayer();
+        }
+    }
+    private void DamagePlayer()
+    {
+        health--;
+        if (health <= 0)
+        {
+            GameManager.Instance.EndGame();
+        }
     }
 }
 

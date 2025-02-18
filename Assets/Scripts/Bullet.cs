@@ -5,7 +5,7 @@ using UnityEngine;
 public class Bullet : MonoBehaviour
 {
     [SerializeField] private float timeToDestroy = 1.5f;
-    [SerializeField] private float damage = 100f;
+    //[SerializeField] private float damage = 100f;
 
     void Start()
     {
@@ -21,7 +21,7 @@ public class Bullet : MonoBehaviour
         Enemy enemy = other.GetComponent<Enemy>();
         if (enemy != null)
         {
-            enemy.DestroyEnemy();
+            enemy.DestroyEnemy(false);
         }
     }
 }

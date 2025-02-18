@@ -36,7 +36,9 @@ public class GameManager : MonoBehaviour
 
     public void EndGame()
     {
-
+        //isPaused = false;
+        //isStarted = false;
+        //StartGameButton.SetActive(true);
     }
 
     public void SetPauseState(bool pauseState)
