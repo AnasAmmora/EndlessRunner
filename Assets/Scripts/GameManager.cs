@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -39,6 +40,7 @@ public class GameManager : MonoBehaviour
         //isPaused = false;
         //isStarted = false;
         //StartGameButton.SetActive(true);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
     public void SetPauseState(bool pauseState)
