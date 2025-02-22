@@ -52,28 +52,30 @@ public class PlayerCharacterController : MonoBehaviour
         HandleMovement();
         HandleAttack();
     }
+    void LateUpdate()
+    {
+        transform.GetChild(0).localPosition = Vector3.zero;
+    }
 
     private void HandleGravity()
     {
         isGrounded = Physics.CheckSphere(transform.position, 0.4f, groundLayers, QueryTriggerInteraction.Ignore);
 
+        if (isGrounded && velocity.y < 0)
+        {
+            velocity.y = -2f; 
+        }
+
         if (isGrounded && Input.GetButtonDown("Jump"))
         {
-            velocity.y += Mathf.Sqrt(jumpHeight * -2 * gravity);
+            velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
             HandleJumpAnimation();
         }
 
-        if (isGrounded && velocity.y < 0)
-        {
-            velocity.y = 0;
-        }
-        else
-        {
-            velocity.y += gravity * Time.deltaTime;
-        }
-
+        velocity.y += gravity * Time.deltaTime; 
         characterController.Move(velocity * Time.deltaTime);
     }
+
     private void HandleMovement()
     {
         characterController.Move(new Vector3(0, 0, runSpeed) * Time.deltaTime);
